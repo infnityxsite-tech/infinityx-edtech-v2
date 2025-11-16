@@ -4,7 +4,6 @@ import uploadRouter from "../routes/upload";
 import { createServer } from "http";
 import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
-import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
@@ -31,14 +30,12 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
+  
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
-  // ✅ File upload endpoint
-// OAuth callback under /api/oauth/callback
-  registerOAuthRoutes(app);
 
-  // 🧩 File upload route
+  // File upload route
   app.use("/api/upload", uploadRouter);
   app.use("/uploads", express.static("uploads"));
 
