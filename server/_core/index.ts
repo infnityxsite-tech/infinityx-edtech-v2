@@ -7,6 +7,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { autoInitializeDatabase } from "../auto-init-db";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -28,6 +29,14 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 }
 
 async function startServer() {
+  // Auto-initialize database on startup (no shell access needed!)
+  try {
+    await autoInitializeDatabase();
+  } catch (error) {
+    console.error('⚠️  Database initialization failed:', error);
+    console.error('⚠️  Server will continue, but database operations may fail');
+  }
+
   const app = express();
   const server = createServer(app);
   
