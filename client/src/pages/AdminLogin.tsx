@@ -10,18 +10,28 @@ import { toast } from "sonner";
 
 export default function AdminLogin() {
   const [, navigate] = useLocation();
+  const utils = trpc.useUtils();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const loginMutation = trpc.auth.login.useMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       // Store token in localStorage
       localStorage.setItem("adminToken", data.token);
       localStorage.setItem("isAdminLoggedIn", "true");
+      
       toast.success("Login successful!");
-      navigate("/admin");
+      
+      // Invalidate auth.me query to refetch user data
+      await utils.auth.me.invalidate();
+      
+      // Small delay to ensure cookie is set
+      setTimeout(() => {
+        // Force navigation
+        window.location.href = "/admin";
+      }, 100);
     },
     onError: (error) => {
       toast.error(error.message || "Invalid username or password");
