@@ -47,7 +47,10 @@ export const appRouter = router({
       }),
 
     // Get current user
-    me: publicProcedure.query(({ ctx }) => ctx.user),
+    me: publicProcedure.query(({ ctx }) => {
+      // Return user or null explicitly
+      return ctx.user || null;
+    }),
 
     // Logout endpoint
     logout: publicProcedure.mutation(({ ctx }) => {
