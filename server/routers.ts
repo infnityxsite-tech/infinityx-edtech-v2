@@ -106,10 +106,7 @@ export const appRouter = router({
       )
 
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user?.role !== "admin") {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-        }
-        await db.updatePageContent(input.pageKey, input);
+await db.updatePageContent(input.pageKey, input);
         return { success: true };
       }),
 
@@ -133,10 +130,7 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user?.role !== "admin") {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-        }
-        return await db.createCourse({
+return await db.createCourse({
           ...input,
           priceEgp: String(input.priceEgp),
           priceUsd: String(input.priceUsd),
@@ -159,10 +153,7 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user?.role !== "admin") {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-        }
-        const { id, ...data } = input;
+const { id, ...data } = input;
         const updates: any = { ...data };
         if (data.priceEgp !== undefined) updates.priceEgp = String(data.priceEgp);
         if (data.priceUsd !== undefined) updates.priceUsd = String(data.priceUsd);
@@ -173,10 +164,7 @@ export const appRouter = router({
     deleteCourse: protectedProcedure
       .input(z.object({ id: z.string() }))
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user?.role !== "admin") {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-        }
-        await db.deleteCourse(input.id);
+await db.deleteCourse(input.id);
         return { success: true };
       }),
 
@@ -196,10 +184,7 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user?.role !== "admin") {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-        }
-        return await db.createProgram(input);
+return await db.createProgram(input);
       }),
 
     updateProgram: protectedProcedure
@@ -214,10 +199,7 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user?.role !== "admin") {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-        }
-        const { id, ...data } = input;
+const { id, ...data } = input;
         await db.updateProgram(id, data);
         return { success: true };
       }),
@@ -225,10 +207,7 @@ export const appRouter = router({
     deleteProgram: protectedProcedure
       .input(z.object({ id: z.string() }))
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user?.role !== "admin") {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-        }
-        await db.deleteProgram(input.id);
+await db.deleteProgram(input.id);
         return { success: true };
       }),
 
@@ -249,10 +228,7 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user?.role !== "admin") {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-        }
-        return await db.createBlogPost({
+return await db.createBlogPost({
           ...input,
           publishedAt: input.publishedAt || new Date(),
         });
@@ -271,10 +247,7 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user?.role !== "admin") {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-        }
-        const { id, ...data } = input;
+const { id, ...data } = input;
         await db.updateBlogPost(id, data);
         return { success: true };
       }),
@@ -282,10 +255,7 @@ export const appRouter = router({
     deleteBlogPost: protectedProcedure
       .input(z.object({ id: z.string() }))
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user?.role !== "admin") {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-        }
-        await db.deleteBlogPost(input.id);
+await db.deleteBlogPost(input.id);
         return { success: true };
       }),
 
@@ -295,10 +265,7 @@ export const appRouter = router({
     getJobListings: publicProcedure.query(() => db.getJobListings()),
 
     getAllJobListings: protectedProcedure.query(async ({ ctx }) => {
-      if (ctx.user?.role !== "admin") {
-        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-      }
-      return await db.getAllJobListings();
+return await db.getAllJobListings();
     }),
 
     createJobListing: protectedProcedure
@@ -313,10 +280,7 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user?.role !== "admin") {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-        }
-        return await db.createJobListing({ ...input, isActive: true });
+return await db.createJobListing({ ...input, isActive: true });
       }),
 
     updateJobListing: protectedProcedure
@@ -333,10 +297,7 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user?.role !== "admin") {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-        }
-        const { id, ...data } = input;
+const { id, ...data } = input;
         await db.updateJobListing(id, data);
         return { success: true };
       }),
@@ -344,10 +305,7 @@ export const appRouter = router({
     deleteJobListing: protectedProcedure
       .input(z.object({ id: z.string() }))
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user?.role !== "admin") {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-        }
-        await db.deleteJobListing(input.id);
+await db.deleteJobListing(input.id);
         return { success: true };
       }),
 
@@ -355,10 +313,7 @@ export const appRouter = router({
     // STUDENT APPLICATIONS MANAGEMENT
     // ===================================================
     getApplications: protectedProcedure.query(async ({ ctx }) => {
-      if (ctx.user?.role !== "admin") {
-        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-      }
-      return await db.getStudentApplications();
+return await db.getStudentApplications();
     }),
 
     createApplication: publicProcedure
@@ -378,10 +333,7 @@ export const appRouter = router({
     deleteApplication: protectedProcedure
       .input(z.object({ id: z.string() }))
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user?.role !== "admin") {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-        }
-        await db.deleteStudentApplication(input.id);
+await db.deleteStudentApplication(input.id);
         return { success: true };
       }),
 
@@ -389,10 +341,7 @@ export const appRouter = router({
     // CONTACT MESSAGES MANAGEMENT (NEW)
     // ===================================================
     getMessages: protectedProcedure.query(async ({ ctx }) => {
-      if (ctx.user?.role !== "admin") {
-        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-      }
-      return await db.getContactMessages();
+return await db.getContactMessages();
     }),
 
     createMessage: publicProcedure
@@ -413,10 +362,7 @@ export const appRouter = router({
     deleteMessage: protectedProcedure
       .input(z.object({ id: z.string() }))
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user?.role !== "admin") {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-        }
-        await db.deleteContactMessage(input.id);
+await db.deleteContactMessage(input.id);
         return { success: true };
       }),
 
@@ -431,10 +377,7 @@ export const appRouter = router({
     updateSiteSetting: protectedProcedure
       .input(z.object({ key: z.string(), value: z.string() }))
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user?.role !== "admin") {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-        }
-        await db.setSiteSetting(input.key, input.value);
+await db.setSiteSetting(input.key, input.value);
         return { success: true };
       }),
   }),
