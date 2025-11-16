@@ -15,14 +15,28 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import Apply from "./pages/Apply";
 import Contact from "./pages/Contact";
+import { useAuth } from "./_core/hooks/useAuth";
 
-// 🔒 Protected route for admin (Wouter version)
+// 🔒 Protected route for admin
 function ProtectedRoute({ component: Component }: { component: React.FC }) {
   const [, navigate] = useLocation();
-  const isLoggedIn = localStorage.getItem("isAdminLoggedIn") === "true";
+  const { user, loading } = useAuth();
 
-  if (!isLoggedIn) {
-    navigate("/admin/login"); // ✅ Redirect manually using Wouter navigation
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirect to login if not authenticated
+  if (!user) {
+    navigate("/admin-login");
     return null;
   }
 
@@ -41,7 +55,7 @@ function Router() {
       <Route path="/blog/:id" component={BlogDetail} />
       <Route path="/careers" component={Careers} />
       <Route path="/contact" component={Contact} />
-      <Route path="/admin/login" component={AdminLogin} />
+      <Route path="/admin-login" component={AdminLogin} />
 
       {/* ✅ Protected admin route */}
       <Route path="/admin" component={() => <ProtectedRoute component={AdminDashboard} />} />
