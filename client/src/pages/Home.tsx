@@ -15,9 +15,16 @@ import {
 } from "lucide-react";
 
 export default function Home() {
-  const { data: pageContent, isLoading } = trpc.admin.getPageContent.useQuery({
-    pageKey: "home",
-  });
+  // ✅ FIX: Disable caching so images update immediately after admin changes
+  const { data: pageContent, isLoading } = trpc.admin.getPageContent.useQuery(
+    { pageKey: "home" },
+    { 
+      staleTime: 0,  // Always consider data stale
+      cacheTime: 0,  // Don't cache at all
+      refetchOnMount: true,  // Refetch when component mounts
+      refetchOnWindowFocus: true  // Refetch when user returns to tab
+    }
+  );
 
   if (isLoading) {
     return (
@@ -48,24 +55,21 @@ export default function Home() {
               {pageContent?.headline ||
                 "Empowering the Next Generation of Tech Leaders"}
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-blue-100 leading-relaxed">
+            <p className="text-xl md:text-2xl mb-8 text-slate-200">
               {pageContent?.subHeadline ||
                 "Master cutting-edge technologies through hands-on learning, expert mentorship, and real-world projects that prepare you for the future."}
             </p>
-            <div className="flex gap-4 flex-wrap">
+            <div className="flex flex-wrap gap-4">
               <Link href="/courses">
-                <Button
-                  size="lg"
-                  className="bg-blue-600 text-white hover:bg-blue-700 font-semibold text-lg px-8 py-6"
-                >
-                  Explore Courses <ArrowRight className="ml-2 w-5 h-5" />
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8">
+                  Explore Courses <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
-              <Link href="/contact">
+              <Link href="/about">
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-2 border-white text-white hover:bg-white hover:text-blue-700 font-semibold text-lg px-8 py-6"
+                  className="bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20 text-lg px-8"
                 >
                   Get Started
                 </Button>
@@ -75,30 +79,30 @@ export default function Home() {
         </div>
       </section>
 
-      {/* === STATS SECTION === */}
+      {/* === STATISTICS SECTION === */}
       <section className="py-16 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div className="p-6">
-              <Users className="w-12 h-12 text-white mx-auto mb-3" />
-              <p className="text-5xl font-bold mb-2">
-                {pageContent?.studentsTrained?.toLocaleString() || "5,000"}+
-              </p>
-              <p className="text-blue-100 text-lg">Students Trained</p>
+          <div className="grid md:grid-cols-3 gap-8 text-center">
+            <div>
+              <Users className="w-12 h-12 mx-auto mb-4" />
+              <div className="text-5xl font-bold mb-2">
+                {pageContent?.studentsTrained || 500}+
+              </div>
+              <div className="text-xl">Students Trained</div>
             </div>
-            <div className="p-6">
-              <Laptop className="w-12 h-12 text-white mx-auto mb-3" />
-              <p className="text-5xl font-bold mb-2">
-                {pageContent?.expertInstructors || 50}+
-              </p>
-              <p className="text-blue-100 text-lg">Expert Instructors</p>
+            <div>
+              <Brain className="w-12 h-12 mx-auto mb-4" />
+              <div className="text-5xl font-bold mb-2">
+                {pageContent?.expertInstructors || 15}+
+              </div>
+              <div className="text-xl">Expert Instructors</div>
             </div>
-            <div className="p-6">
-              <Rocket className="w-12 h-12 text-white mx-auto mb-3" />
-              <p className="text-5xl font-bold mb-2">
+            <div>
+              <Rocket className="w-12 h-12 mx-auto mb-4" />
+              <div className="text-5xl font-bold mb-2">
                 {pageContent?.jobPlacementRate || 95}%
-              </p>
-              <p className="text-blue-100 text-lg">Job Placement Rate</p>
+              </div>
+              <div className="text-xl">Job Placement Rate</div>
             </div>
           </div>
         </div>
@@ -107,118 +111,89 @@ export default function Home() {
       {/* === VISION SECTION === */}
       <section className="py-24 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-slate-900">
-                Our Vision
+              <h2 className="text-4xl font-bold mb-6 text-slate-900">
+                {pageContent?.visionText || "Our Vision for Tech Education"}
               </h2>
-              <p className="text-lg text-slate-600 leading-relaxed mb-6">
-                At InfinityX, we envision a future where technology education is accessible, 
-                practical, and transformative. We're committed to empowering learners with 
-                the skills they need to thrive in the digital age.
+              <p className="text-lg text-slate-700 mb-6">
+                We believe in transforming lives through technology education. Our mission is to make cutting-edge tech skills accessible to everyone, regardless of their background.
               </p>
               <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
-                  <div>
-                    <h3 className="font-semibold text-slate-900 mb-1">Industry-Relevant Curriculum</h3>
-                    <p className="text-slate-600">Learn technologies that companies actually use</p>
-                  </div>
+                <div className="flex items-start">
+                  <CheckCircle className="w-6 h-6 text-blue-600 mr-3 mt-1 flex-shrink-0" />
+                  <p className="text-slate-700">Industry-aligned curriculum designed by experts</p>
                 </div>
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
-                  <div>
-                    <h3 className="font-semibold text-slate-900 mb-1">Hands-On Projects</h3>
-                    <p className="text-slate-600">Build real-world applications from day one</p>
-                  </div>
+                <div className="flex items-start">
+                  <CheckCircle className="w-6 h-6 text-blue-600 mr-3 mt-1 flex-shrink-0" />
+                  <p className="text-slate-700">Hands-on projects with real-world applications</p>
                 </div>
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
-                  <div>
-                    <h3 className="font-semibold text-slate-900 mb-1">Expert Mentorship</h3>
-                    <p className="text-slate-600">Learn from industry professionals with years of experience</p>
-                  </div>
+                <div className="flex items-start">
+                  <CheckCircle className="w-6 h-6 text-blue-600 mr-3 mt-1 flex-shrink-0" />
+                  <p className="text-slate-700">Personalized mentorship and career guidance</p>
                 </div>
               </div>
             </div>
-            <div>
+            <div className="relative">
               <img
-                src={pageContent?.visionImageUrl || "/assets/vision-learning.jpg"}
+                src={pageContent?.visionImageUrl || "/assets/vision-section.jpg"}
                 alt="Vision"
-                className="rounded-2xl shadow-2xl w-full object-cover"
+                className="rounded-lg shadow-2xl w-full"
+                loading="lazy"
               />
             </div>
           </div>
         </div>
       </section>
 
-      {/* === TECH FIELDS === */}
+      {/* === PROGRAMS OVERVIEW === */}
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-slate-900">
-              Master In-Demand Technologies
+            <h2 className="text-4xl font-bold mb-4 text-slate-900">
+              Our Programs
             </h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              Choose from our specialized programs designed to make you job-ready in the most 
-              sought-after tech fields
+              Choose from our comprehensive range of programs designed to take you from beginner to professional
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* AI Card */}
-            <div className="group p-8 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-blue-100">
-              <div className="bg-blue-600 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Brain className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold mb-3 text-slate-900">
-                Artificial Intelligence
-              </h3>
-              <p className="text-slate-600 mb-4 leading-relaxed">
-                Master machine learning, deep learning, and AI applications. Build intelligent 
-                systems that solve real-world problems.
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 rounded-xl border border-blue-100">
+              <Code className="w-12 h-12 text-blue-600 mb-4" />
+              <h3 className="text-2xl font-bold mb-3 text-slate-900">Full-Stack Development</h3>
+              <p className="text-slate-700 mb-4">
+                Master both frontend and backend technologies to build complete web applications
               </p>
               <Link href="/courses">
-                <Button variant="link" className="text-blue-600 p-0 h-auto font-semibold">
-                  Learn More <ArrowRight className="ml-1 w-4 h-4" />
+                <Button variant="link" className="text-blue-600 p-0">
+                  Learn More <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
             </div>
 
-            {/* Web Dev Card */}
-            <div className="group p-8 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-blue-100">
-              <div className="bg-blue-600 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Code className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold mb-3 text-slate-900">
-                Web Development
-              </h3>
-              <p className="text-slate-600 mb-4 leading-relaxed">
-                Build modern, responsive web applications using the latest frameworks and 
-                technologies. Full-stack expertise guaranteed.
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-8 rounded-xl border border-purple-100">
+              <Shield className="w-12 h-12 text-purple-600 mb-4" />
+              <h3 className="text-2xl font-bold mb-3 text-slate-900">Cybersecurity</h3>
+              <p className="text-slate-700 mb-4">
+                Learn to protect systems and networks from digital threats and attacks
               </p>
               <Link href="/courses">
-                <Button variant="link" className="text-blue-600 p-0 h-auto font-semibold">
-                  Learn More <ArrowRight className="ml-1 w-4 h-4" />
+                <Button variant="link" className="text-purple-600 p-0">
+                  Learn More <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
             </div>
 
-            {/* Cybersecurity Card */}
-            <div className="group p-8 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-blue-100">
-              <div className="bg-blue-600 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Shield className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold mb-3 text-slate-900">
-                Cybersecurity
-              </h3>
-              <p className="text-slate-600 mb-4 leading-relaxed">
-                Protect digital assets and infrastructure. Learn ethical hacking, security 
-                protocols, and defense strategies.
+            <div className="bg-gradient-to-br from-green-50 to-teal-50 p-8 rounded-xl border border-green-100">
+              <Laptop className="w-12 h-12 text-green-600 mb-4" />
+              <h3 className="text-2xl font-bold mb-3 text-slate-900">Data Science & AI</h3>
+              <p className="text-slate-700 mb-4">
+                Dive into machine learning, data analysis, and artificial intelligence
               </p>
               <Link href="/courses">
-                <Button variant="link" className="text-blue-600 p-0 h-auto font-semibold">
-                  Learn More <ArrowRight className="ml-1 w-4 h-4" />
+                <Button variant="link" className="text-green-600 p-0">
+                  Learn More <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
             </div>
@@ -226,22 +201,18 @@ export default function Home() {
         </div>
       </section>
 
-      {/* === CALL TO ACTION === */}
+      {/* === CTA SECTION === */}
       <section className="py-24 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
-        <div className="max-w-5xl mx-auto px-6 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Ready to Transform Your Career?
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 className="text-4xl font-bold mb-6">
+            Ready to Start Your Tech Journey?
           </h2>
-          <p className="text-xl text-blue-100 mb-10 leading-relaxed">
-            Join thousands of students who have launched successful tech careers with InfinityX. 
-            Start your journey today.
+          <p className="text-xl mb-8 text-blue-100">
+            Join thousands of students who have transformed their careers with InfinityX
           </p>
-          <div className="flex justify-center gap-4 flex-wrap">
+          <div className="flex flex-wrap gap-4 justify-center">
             <Link href="/courses">
-              <Button
-                size="lg"
-                className="bg-white text-blue-700 hover:bg-blue-50 font-semibold text-lg px-8 py-6"
-              >
+              <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50 text-lg px-8">
                 Browse Courses
               </Button>
             </Link>
@@ -249,7 +220,7 @@ export default function Home() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-2 border-white text-white hover:bg-white hover:text-blue-700 font-semibold text-lg px-8 py-6"
+                className="border-white text-white hover:bg-white/10 text-lg px-8"
               >
                 Contact Us
               </Button>
@@ -257,40 +228,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* === FOOTER === */}
-      <footer className="bg-slate-900 text-white py-12">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-            <div>
-              <h3 className="text-xl font-bold mb-4">InfinityX EdTech</h3>
-              <p className="text-slate-400">
-                Empowering the next generation of tech leaders through quality education and mentorship.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-xl font-bold mb-4">Quick Links</h3>
-              <div className="space-y-2">
-                <Link href="/courses"><a className="block text-slate-400 hover:text-white transition">Courses</a></Link>
-                <Link href="/programs"><a className="block text-slate-400 hover:text-white transition">Programs</a></Link>
-                <Link href="/about"><a className="block text-slate-400 hover:text-white transition">About Us</a></Link>
-                <Link href="/contact"><a className="block text-slate-400 hover:text-white transition">Contact</a></Link>
-              </div>
-            </div>
-            <div>
-              <h3 className="text-xl font-bold mb-4">Contact Us</h3>
-              <div className="space-y-2 text-slate-400">
-                <p>Email: <a href="mailto:infnityx.site@gmail.com" className="hover:text-white transition">infnityx.site@gmail.com</a></p>
-                <p>Phone: <a href="tel:+201090364947" className="hover:text-white transition">+20 109 036 4947</a></p>
-                <p>Location: Cairo, Egypt</p>
-              </div>
-            </div>
-          </div>
-          <div className="border-t border-slate-800 pt-8 text-center text-slate-400">
-            <p>&copy; {new Date().getFullYear()} InfinityX EdTech Platform. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
