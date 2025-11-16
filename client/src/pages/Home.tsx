@@ -67,7 +67,7 @@ export default function Home() {
                   Explore Courses <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
-              <Link href="/about">
+              <Link href="/contact">
                 <Button
                   size="lg"
                   variant="outline"
