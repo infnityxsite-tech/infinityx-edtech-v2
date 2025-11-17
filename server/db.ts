@@ -144,6 +144,7 @@ export interface Course {
   instructor?: string | null;
   priceEgp: number;
   priceUsd: number;
+  courseLink?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -154,6 +155,7 @@ export async function getCourses(): Promise<Course[]> {
   return await queryMany<any>(
     `SELECT id, title, description, image_url as "imageUrl", duration, level, 
             instructor, price_egp as "priceEgp", price_usd as "priceUsd",
+            course_link as "courseLink",
             created_at as "createdAt", updated_at as "updatedAt"
      FROM courses ORDER BY created_at DESC`
   );
@@ -163,6 +165,7 @@ export async function getCourseById(id: string): Promise<Course | undefined> {
   const result = await queryOne<any>(
     `SELECT id, title, description, image_url as "imageUrl", duration, level,
             instructor, price_egp as "priceEgp", price_usd as "priceUsd",
+            course_link as "courseLink",
             created_at as "createdAt", updated_at as "updatedAt"
      FROM courses WHERE id = $1`,
     [id]
@@ -172,10 +175,10 @@ export async function getCourseById(id: string): Promise<Course | undefined> {
 
 export async function createCourse(course: InsertCourse) {
   await query(
-    `INSERT INTO courses (title, description, image_url, duration, level, instructor, price_egp, price_usd)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+    `INSERT INTO courses (title, description, image_url, duration, level, instructor, price_egp, price_usd, course_link)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
     [course.title, course.description, course.imageUrl, course.duration, course.level, 
-     course.instructor, course.priceEgp, course.priceUsd]
+     course.instructor, course.priceEgp, course.priceUsd, course.courseLink]
   );
 }
 
