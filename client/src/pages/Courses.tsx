@@ -96,9 +96,19 @@ export default function Courses() {
 
                   <CardContent className="flex-1 flex flex-col justify-between space-y-4">
                     <div>
-                      <p className="text-slate-600 text-sm leading-relaxed line-clamp-3">
+                      <p className="text-slate-600 text-sm leading-relaxed">
                         {course.description}
                       </p>
+                      {course.courseLink && (
+                        <a
+                          href={course.courseLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm font-medium mt-2"
+                        >
+                          📖 Know More →
+                        </a>
+                      )}
                       <div className="mt-4 space-y-2 text-sm text-slate-600">
                         {course.duration && (
                           <div className="flex items-center gap-2">

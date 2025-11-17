@@ -58,6 +58,7 @@ CREATE TABLE IF NOT EXISTS courses (
   instructor VARCHAR(255),
   price_egp DECIMAL(10, 2) DEFAULT 0,
   price_usd DECIMAL(10, 2) DEFAULT 0,
+  course_link TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

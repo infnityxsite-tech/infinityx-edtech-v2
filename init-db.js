@@ -34,6 +34,15 @@ async function initDatabase() {
     console.log('📊 Creating tables and indexes...');
     await pool.query(schema);
 
+    // Run migrations
+    console.log('🔄 Running database migrations...');
+    try {
+      await pool.query('ALTER TABLE courses ADD COLUMN IF NOT EXISTS course_link TEXT');
+      console.log('✅ Migration: Added course_link column to courses table');
+    } catch (migrationError) {
+      console.log('ℹ️  Migration already applied or skipped');
+    }
+
     console.log('\n✅ Database initialized successfully!\n');
     console.log('===========================================');
     console.log('📋 Default Admin Credentials:');

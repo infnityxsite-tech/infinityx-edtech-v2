@@ -21,6 +21,7 @@ export default function CoursesManager() {
     instructor: "",
     priceEgp: 0,
     priceUsd: 0,
+    courseLink: "",
   });
 
   const utils = trpc.useUtils();
@@ -64,6 +65,7 @@ export default function CoursesManager() {
       instructor: "",
       priceEgp: 0,
       priceUsd: 0,
+      courseLink: "",
     });
     setEditingId(null);
   };
@@ -97,6 +99,7 @@ export default function CoursesManager() {
       instructor: course.instructor || "",
       priceEgp: course.priceEgp ?? 0,
       priceUsd: course.priceUsd ?? 0,
+      courseLink: course.courseLink || "",
     });
     setEditingId(course.id);
     setOpen(true);
@@ -142,7 +145,7 @@ export default function CoursesManager() {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Course description"
-                  rows={3}
+                  rows={6}
                 />
               </div>
 
@@ -216,6 +219,18 @@ export default function CoursesManager() {
                   onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
                   placeholder="https://example.com/image.jpg"
                 />
+              </div>
+
+              {/* Course Link (Know More) */}
+              <div className="space-y-2">
+                <Label htmlFor="courseLink">Course Link (Know More)</Label>
+                <Input
+                  id="courseLink"
+                  value={formData.courseLink}
+                  onChange={(e) => setFormData({ ...formData, courseLink: e.target.value })}
+                  placeholder="https://shorturl.at/pvLp3"
+                />
+                <p className="text-xs text-slate-500">External link for "Know More" button</p>
               </div>
 
               <Button

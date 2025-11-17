@@ -129,6 +129,7 @@ export const appRouter = router({
           // --- FIX: Replaced 'price' with 'priceEgp' and 'priceUsd' ---
           priceEgp: z.number().default(0),
           priceUsd: z.number().default(0),
+          courseLink: z.string().optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -152,6 +153,7 @@ return await db.createCourse({
           // --- FIX: Replaced 'price' with 'priceEgp' and 'priceUsd' (as optional) ---
           priceEgp: z.number().optional(),
           priceUsd: z.number().optional(),
+          courseLink: z.string().optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
