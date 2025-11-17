@@ -61,8 +61,8 @@ export default function Contact() {
   // ✅ These values will later come from your Admin “Site Settings”
   const siteInfo = {
     email: "infnityx.site@gmail.com",
-    phone: "+20 109 036 4947",
-    whatsapp: "https://wa.me/201090364947",
+    phone: "+201100135225",
+    whatsapp: "https://wa.me/qr/DPIFTRQ4NI3VP1",
     location: "Cairo, Egypt",
   };
 
