@@ -1,93 +1,184 @@
-import { Toaster } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/NotFound";
-import { Route, Switch, useLocation } from "wouter";
-import ErrorBoundary from "./components/ErrorBoundary";
-import { ThemeProvider } from "./contexts/ThemeContext";
-import Home from "./pages/Home";
-import About from "./pages/About";
-import Courses from "./pages/Courses";
-import Programs from "./pages/Programs";
-import SchoolLanding from "./pages/SchoolLanding"; 
-import Blog from "./pages/Blog";
-import BlogDetail from "./pages/BlogDetail";
-import Careers from "./pages/Careers";
-import AdminLogin from "./pages/AdminLogin";
-import AdminDashboard from "./pages/AdminDashboard";
-import Apply from "./pages/Apply";
-import Contact from "./pages/Contact";
-import { useAuth } from "./_core/hooks/useAuth";
+import { useState, useEffect } from "react";
+import { useLocation, useRoute } from "wouter"; 
+import { trpc } from "@/lib/trpc";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { Loader2, CheckCircle2 } from "lucide-react";
 
-// 🔒 Protected route for admin
-function ProtectedRoute({ component: Component }: { component: React.FC }) {
-  const [, navigate] = useLocation();
-  const { user, loading } = useAuth();
+// ✅ CLEAN IMPORTS: No ErrorBoundary here!
 
-  // Show loading state
-  if (loading) {
+export default function Apply() {
+  const [location, navigate] = useLocation();
+  
+  // 1. CATCH THE ID FROM URL PATH
+  const [match, params] = useRoute("/apply/:id");
+  const pathId = match ? params?.id : null;
+
+  // 2. CATCH QUERY PARAMS
+  const searchString = window.location.search; 
+  const urlParams = new URLSearchParams(searchString);
+  const queryId = urlParams.get("courseId");
+  const courseName = urlParams.get("courseName");
+
+  const finalCourseId = pathId || queryId || "";
+
+  const [submitted, setSubmitted] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    message: "",
+  });
+
+  const createApplication = trpc.admin.createApplication.useMutation({
+    onSuccess: () => {
+      toast.success("Your application has been submitted successfully!");
+      setSubmitted(true);
+      setFormData({ fullName: "", email: "", phone: "", message: "" });
+    },
+    onError: () => {
+      toast.error("Something went wrong. Please try again later.");
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.fullName || !formData.email) {
+      toast.error("Please fill in your name and email.");
+      return;
+    }
+
+    if (!finalCourseId) {
+        toast.error("Error: No course selected. Please go back and select a course.");
+        return;
+    }
+
+    createApplication.mutate({
+      ...formData,
+      courseId: finalCourseId,
+    });
+  };
+
+  if (submitted) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 px-4">
+        <Card className="max-w-md w-full text-center shadow-xl">
+          <CardHeader>
+            <CheckCircle2 className="w-12 h-12 text-green-600 mx-auto mb-3" />
+            <CardTitle className="text-2xl text-slate-900">
+              Application Submitted!
+            </CardTitle>
+            <CardDescription className="text-slate-600 mt-2">
+              Thank you for applying. Our team will contact you soon.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              onClick={() => navigate("/programs")}
+              className="w-full mt-4"
+            >
+              Back to Programs
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
-  // Redirect to login if not authenticated
-  if (!user) {
-    navigate("/admin-login");
-    return null;
-  }
-
-  return <Component />;
-}
-
-function Router() {
   return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/about" component={About} />
-      <Route path="/courses" component={Courses} />
-      
-      {/* 🚀 FIXED: Added route for specific application IDs */}
-      <Route path="/apply" component={Apply} />
-      <Route path="/apply/:id" component={Apply} />
-      
-      {/* ✅ EXISTING ROUTE (The list of all programs) */}
-      <Route path="/programs" component={Programs} />
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center px-4 py-20">
+      <Card className="w-full max-w-lg shadow-lg border border-slate-200">
+        <CardHeader>
+          <CardTitle className="text-2xl text-slate-900 text-center">
+            {courseName ? `Apply for ${decodeURIComponent(courseName)}` : "Student Application"}
+          </CardTitle>
+          <CardDescription className="text-center text-slate-600">
+            Fill in your details below to secure your spot.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            
+            <input type="hidden" value={finalCourseId} />
 
-      {/* 🚀 School Landing Pages */}
-      <Route path="/programs/:category" component={SchoolLanding} />
+            <div>
+              <Label htmlFor="fullName">Full Name *</Label>
+              <Input
+                id="fullName"
+                value={formData.fullName}
+                onChange={(e) =>
+                  setFormData({ ...formData, fullName: e.target.value })
+                }
+                placeholder="Your full name"
+                required
+              />
+            </div>
 
-      <Route path="/blog" component={Blog} />
-      <Route path="/blog/:id" component={BlogDetail} />
-      <Route path="/careers" component={Careers} />
-      <Route path="/contact" component={Contact} />
-      <Route path="/admin-login" component={AdminLogin} />
+            <div>
+              <Label htmlFor="email">Email *</Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                placeholder="you@example.com"
+                required
+              />
+            </div>
 
-      {/* ✅ Protected admin route */}
-      <Route path="/admin" component={() => <ProtectedRoute component={AdminDashboard} />} />
+            <div>
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                value={formData.phone}
+                onChange={(e) =>
+                  setFormData({ ...formData, phone: e.target.value })
+                }
+                placeholder="+20 10 xxxx xxxx"
+              />
+            </div>
 
-      <Route path="/404" component={NotFound} />
-      <Route component={NotFound} />
-    </Switch>
+            <div>
+              <Label htmlFor="message">Statement of Purpose (Optional)</Label>
+              <Textarea
+                id="message"
+                value={formData.message}
+                onChange={(e) =>
+                  setFormData({ ...formData, message: e.target.value })
+                }
+                placeholder="Why do you want to join this program?"
+                rows={3}
+              />
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700"
+              disabled={createApplication.isPending}
+            >
+              {createApplication.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Submitting...
+                </>
+              ) : (
+                "Submit Application"
+              )}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
-
-// ✅ App entry point
-function App() {
-  return (
-    <ErrorBoundary>
-      <ThemeProvider defaultTheme="light">
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
-      </ThemeProvider>
-    </ErrorBoundary>
-  );
-}
-
-export default App;
